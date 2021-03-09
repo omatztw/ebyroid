@@ -15,6 +15,9 @@ struct ConvertParams {
   char* base_dir;
   char* voice;
   float volume;
+  float speed;
+  float pitch;
+  float range;
 };
 
 class Ebyroid {
@@ -25,7 +28,7 @@ class Ebyroid {
 
   static Ebyroid* Create(const std::string& base_dir, const std::string& voice, float volume);
   int Hiragana(const unsigned char* inbytes, unsigned char** outbytes, size_t* outsize);
-  int Speech(const unsigned char* inbytes, int16_t** outbytes, size_t* outsize, uint32_t mode = 0u);
+  int Speech(const unsigned char* inbytes, const ConvertParams& params, int16_t** outbytes, size_t* outsize, uint32_t mode = 0u);
   int Convert(const ConvertParams& params,
               const unsigned char* inbytes,
               int16_t** outbytes,

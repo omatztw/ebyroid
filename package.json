@@ -69,7 +69,8 @@
     "pack:release": "run-s build:release pack:clean pack:pkg pack:copy",
     "pack:copy": "@powershell -Command Copy-Item ./dll/ebyroid.node -Destination pack",
     "pack:clean": "@powershell -Command if (Test-Path pack) { Remove-Item -Recurse pack }",
-    "pack:pkg": "pkg --options max-http-header-size=65536 --targets node12-win-x86 --out-path pack ."
+    "pack:pkg": "pkg --options max-http-header-size=65536 --targets node12-win-x86 --out-path pack .",
+    "build": "run-s build:release pack:pkg"
   },
   "cmake-js": {
     "runtime": "node",

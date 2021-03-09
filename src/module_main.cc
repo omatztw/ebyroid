@@ -51,7 +51,7 @@ static void async_work_on_execute(napi_env env, void* data) {
     case WORK_SPEECH:
       try {
         int16_t* out;
-        result = module->ebyroid->Speech(work->input, &out, &work->output_size);
+        result = module->ebyroid->Speech(work->input, *work->convert_params, &out, &work->output_size);
         work->output = out;
       } catch (std::exception& e) {
         Eprintf("(Ebyroid::Speech) %s", e.what());
@@ -186,6 +186,7 @@ static napi_value do_async_work(napi_env env, napi_callback_info info, work_type
   status = napi_get_cb_info(env, info, &argc, argv, NULL, NULL);
   en_assert(status == napi_ok);
 
+
   // first arg must be buffer
   bool is_buffer;
   status = napi_is_buffer(env, argv[0], &is_buffer);
@@ -226,7 +227,32 @@ static napi_value do_async_work(napi_env env, napi_callback_info info, work_type
     status = napi_get_value_bool(env, value, &params->needs_reload);
     en_assert(status == napi_ok);
 
+    // fetch .speed float
+    double speed;
+    status = napi_get_named_property(env, argv[1], "speed", &value);
+    en_assert(status == napi_ok);
+    status = napi_get_value_double(env, value, &speed);
+    en_assert(status == napi_ok);
+    params->speed = (float) speed;
+
+    // fetch .pitch float
+    double pitch;
+    status = napi_get_named_property(env, argv[1], "pitch", &value);
+    en_assert(status == napi_ok);
+    status = napi_get_value_double(env, value, &pitch);
+    en_assert(status == napi_ok);
+    params->pitch = (float) pitch;
+
+    // fetch .range float
+    double range;
+    status = napi_get_named_property(env, argv[1], "range", &value);
+    en_assert(status == napi_ok);
+    status = napi_get_value_double(env, value, &range);
+    en_assert(status == napi_ok);
+    params->range = (float) range;
+
     if (params->needs_reload) {
+
       size_t bufsize;
 
       // fetch .base_dir string

@@ -81,21 +81,58 @@ int Ebyroid::Hiragana(const unsigned char* inbytes, unsigned char** outbytes, si
 }
 
 int Ebyroid::Speech(const unsigned char* inbytes,
+                    const ConvertParams& params,
                     int16_t** outbytes,
                     size_t* outsize,
                     uint32_t mode) {
+
+    // SET VOICE PARAM here and etc...
+    // TODO: Need to optimize...
+    uint32_t param_size = 0;
+  if (ResultCode result = api_adapter_->GetParam((void*) 0, &param_size);
+      result != ERR_INSUFFICIENT) {  // NOTE: Code -20 is expected here
+    delete api_adapter_;
+    string message = "API Get Param failed (Could not acquire the size) with code ";
+    message += std::to_string(result);
+    throw std::runtime_error(message);
+  }
+
+  char* param_buffer = new char[param_size];
+  TTtsParam* param = (TTtsParam*) param_buffer;
+  param->size = param_size;
+  if (ResultCode result = api_adapter_->GetParam(param, &param_size); result != ERR_SUCCESS) {
+    delete[] param_buffer;
+    delete api_adapter_;
+    string message = "API Get Param failed with code ";
+    message += std::to_string(result);
+    throw std::runtime_error(message);
+  }
+  param->speaker[0].speed = params.speed;
+  param->speaker[0].pitch = params.pitch;
+  param->speaker[0].range = params.range;
+
+  if (ResultCode result = api_adapter_->SetParam(param); result != ERR_SUCCESS) {
+    delete[] param_buffer;
+    delete api_adapter_;
+    string message = "API Set Param failed with code ";
+    message += std::to_string(result);
+    throw std::runtime_error(message);
+  }
+
+  delete[] param_buffer;
+
   Response* const response = new Response(api_adapter_);
 
-  TJobParam param;
-  param.mode_in_out = mode == 0u ? IOMODE_AIKANA_TO_WAVE : (JobInOut) mode;
-  param.user_data = response;
+  TJobParam jparam;
+  jparam.mode_in_out = mode == 0u ? IOMODE_AIKANA_TO_WAVE : (JobInOut) mode;
+  jparam.user_data = response;
 
   char eventname[32];
   sprintf(eventname, "TTSLOCK:%p", response);
   HANDLE event = CreateEventA(NULL, TRUE, FALSE, eventname);
 
   int32_t job_id;
-  if (ResultCode result = api_adapter_->TextToSpeech(&job_id, &param, (const char*) inbytes);
+  if (ResultCode result = api_adapter_->TextToSpeech(&job_id, &jparam, (const char*) inbytes);
       result != ERR_SUCCESS) {
     delete response;
     ResetEvent(event);
@@ -137,7 +174,7 @@ int Ebyroid::Convert(const ConvertParams& params,
     api_adapter_ = NewAdapter(params.base_dir, params.voice, params.volume);
   }
 
-  return Speech(inbytes, outbytes, outsize, IOMODE_PLAIN_TO_WAVE);
+  return Speech(inbytes, params, outbytes, outsize, IOMODE_PLAIN_TO_WAVE);
 };
 
 void Response::Write(char* bytes, uint32_t size) {
