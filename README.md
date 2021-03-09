@@ -76,10 +76,13 @@ PS C:\ebyroid> ./ebyroid start --port 4567
 
 #### query parameters
 
-|  id   |  type  | required | desc             | example                      |
-| :---: | :----: | :------: | :--------------- | :--------------------------- |
-| text  | string | **yes**  | TTS content      | `text=今日は%20はじめまして` |
-| name  | string |    no    | Voiceroid to use | `name=kiritan-chan`          |
+|  id   |  type  | required | desc                 | example                      |
+| :---: | :----: | :------: | :---------------     | :--------------------------- |
+| text  | string | **yes**  | TTS content          | `text=今日は%20はじめまして`  |
+| name  | string |    no    | Voiceroid to use     | `name=kiritan-chan`          |
+| speed | number |    no    | Speed of this speech | `speed=2.0`                  |
+| pitch | number |    no    | Pitch of this speech | `pitch=2.0`                  |
+| range | number |    no    | Range of this speech | `range=2.0`                  |
 
 #### response types
 
@@ -106,10 +109,13 @@ Use `GET /api/v1/audiofile` instead if you demand `.wav` file.
 
 #### query parameters
 
-|  id   |  type  | required | desc             | example                    |
-| :---: | :----: | :------: | :--------------- | :------------------------- |
-| text  | string | **yes**  | TTS content      | `text=今晩は%20さようなら` |
-| name  | string |    no    | Voiceroid to use | `name=akane-chan`          |
+|  id   |  type  | required | desc                 | example                    |
+| :---: | :----: | :------: | :---------------     | :------------------------- |
+| text  | string | **yes**  | TTS content          | `text=今晩は%20さようなら` |
+| name  | string |    no    | Voiceroid to use     | `name=akane-chan`          |
+| speed | number |    no    | Speed of this speech | `speed=2.0`                |
+| pitch | number |    no    | Pitch of this speech | `pitch=2.0`                |
+| range | number |    no    | Range of this speech | `range=2.0`                |
 
 #### response types
 
